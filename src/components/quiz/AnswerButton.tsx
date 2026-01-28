@@ -27,7 +27,7 @@ export function AnswerButton({
     if (isIncorrect) {
       return 'bg-destructive text-destructive-foreground border-destructive'
     }
-    return 'bg-card hover:bg-secondary/50 border-2 border-border hover:border-primary/50 hover:scale-105'
+    return 'bg-card text-foreground hover:bg-secondary/50 border-2 border-border hover:border-primary/50 hover:scale-105'
   }
 
   return (

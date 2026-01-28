@@ -19,13 +19,22 @@ export function QuizView({ currentQuestionNumber, onAnswerSubmit, difficulty, on
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [startTime, setStartTime] = useState(Date.now())
   const [isProcessing, setIsProcessing] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
 
   useEffect(() => {
-    setQuestion(generateQuestion(difficulty))
-    setStartTime(Date.now())
-    setSelectedAnswer(null)
-    setIsProcessing(false)
-  }, [currentQuestionNumber, difficulty])
+    if (currentQuestionNumber === 1) {
+      setHasStarted(false)
+    }
+  }, [currentQuestionNumber])
+
+  useEffect(() => {
+    if (hasStarted) {
+      setQuestion(generateQuestion(difficulty))
+      setStartTime(Date.now())
+      setSelectedAnswer(null)
+      setIsProcessing(false)
+    }
+  }, [currentQuestionNumber, difficulty, hasStarted])
 
   const handleAnswerClick = async (answer: number) => {
     if (isProcessing || selectedAnswer !== null) return
@@ -65,6 +74,61 @@ export function QuizView({ currentQuestionNumber, onAnswerSubmit, difficulty, on
     hard: 'bg-coral text-white'
   }
 
+  if (!hasStarted && currentQuestionNumber === 1) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="p-6 sm:p-8 shadow-xl">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-primary mb-3">
+              Ready to Start?
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Choose your difficulty level and begin!
+            </p>
+          </div>
+
+          <div className="mb-8">
+            <p className="text-base font-semibold text-foreground mb-4 text-center">
+              Select Difficulty:
+            </p>
+            <div className="flex flex-col gap-3">
+              {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => (
+                <Button
+                  key={level}
+                  variant={difficulty === level ? 'default' : 'outline'}
+                  size="lg"
+                  onClick={() => onDifficultyChange(level)}
+                  className={`text-lg h-14 ${difficulty === level ? difficultyColors[level] : ''}`}
+                >
+                  {difficultyLabels[level]}
+                  {level === 'easy' && ' - Numbers 1-10'}
+                  {level === 'medium' && ' - Numbers 1-20'}
+                  {level === 'hard' && ' - Numbers 1-50'}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <Button
+            onClick={() => {
+              setHasStarted(true)
+              setQuestion(generateQuestion(difficulty))
+              setStartTime(Date.now())
+            }}
+            size="lg"
+            className="w-full text-xl h-16 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            Start Quiz! 🚀
+          </Button>
+        </Card>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -73,25 +137,6 @@ export function QuizView({ currentQuestionNumber, onAnswerSubmit, difficulty, on
       transition={{ duration: 0.3 }}
     >
       <Card className="p-6 sm:p-8 shadow-xl">
-        {currentQuestionNumber === 1 && (
-          <div className="mb-6">
-            <p className="text-sm font-medium text-muted-foreground mb-3">Select Difficulty:</p>
-            <div className="flex gap-2">
-              {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => (
-                <Button
-                  key={level}
-                  variant={difficulty === level ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onDifficultyChange(level)}
-                  className={difficulty === level ? difficultyColors[level] : ''}
-                >
-                  {difficultyLabels[level]}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">
