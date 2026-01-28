@@ -95,13 +95,6 @@ function App() {
       />
       
       <div className="max-w-3xl mx-auto">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-2">
-            Math Quest
-          </h1>
-          <p className="text-lg text-muted-foreground">Learn, Practice, Grow! 🚀</p>
-        </header>
-
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'quiz' | 'progress' | 'achievements')} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="quiz" className="text-base sm:text-lg gap-2">
