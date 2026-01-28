@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { QuizView } from '@/components/quiz/QuizView'
 import { ResultsView } from '@/components/quiz/ResultsView'
 import { ProgressView } from '@/components/analytics/ProgressView'
@@ -9,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartLine, GameController, Trophy } from '@phosphor-icons/react'
 import { Difficulty } from '@/lib/mathGenerator'
 import { getNewlyUnlockedAchievements, Achievement } from '@/lib/achievements'
+import { getAllSessions, addSession, getSetting, setSetting } from '@/lib/db'
 
 export interface QuizAnswer {
   questionId: number
@@ -30,15 +30,34 @@ export interface QuizSession {
 }
 
 function App() {
-  const [sessions, setSessions] = useKV<QuizSession[]>('quiz-sessions', [])
+  const [sessions, setSessions] = useState<QuizSession[]>([])
   const [currentAnswers, setCurrentAnswers] = useState<QuizAnswer[]>([])
   const [isQuizComplete, setIsQuizComplete] = useState(false)
   const [activeTab, setActiveTab] = useState<'quiz' | 'progress' | 'achievements'>('quiz')
-  const [difficulty, setDifficulty] = useKV<Difficulty>('selected-difficulty', 'medium')
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium')
   const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null)
   const [achievementQueue, setAchievementQueue] = useState<Achievement[]>([])
 
-  const handleAnswerSubmit = (answer: QuizAnswer) => {
+  useEffect(() => {
+    const loadData = async () => {
+      const loadedSessions = await getAllSessions<QuizSession>()
+      setSessions(loadedSessions)
+      
+      const savedDifficulty = await getSetting<Difficulty>('selected-difficulty')
+      if (savedDifficulty) {
+        setDifficulty(savedDifficulty)
+      }
+    }
+    
+    loadData()
+  }, [])
+
+  const handleDifficultyChange = async (newDifficulty: Difficulty) => {
+    setDifficulty(newDifficulty)
+    await setSetting('selected-difficulty', newDifficulty)
+  }
+
+  const handleAnswerSubmit = async (answer: QuizAnswer) => {
     const newAnswers = [...currentAnswers, answer]
     setCurrentAnswers(newAnswers)
 
@@ -54,19 +73,18 @@ function App() {
         completedAt: Date.now(),
         score,
         averageTime,
-        difficulty: difficulty || 'medium'
+        difficulty: difficulty
       }
 
-      setSessions((current) => {
-        const updated = [...(current || []), newSession]
-        
-        const newAchievements = getNewlyUnlockedAchievements(current || [], updated)
-        if (newAchievements.length > 0) {
-          setAchievementQueue(newAchievements)
-        }
-        
-        return updated
-      })
+      await addSession(newSession)
+      
+      const updatedSessions = [...sessions, newSession]
+      setSessions(updatedSessions)
+      
+      const newAchievements = getNewlyUnlockedAchievements(sessions, updatedSessions)
+      if (newAchievements.length > 0) {
+        setAchievementQueue(newAchievements)
+      }
     }
   }
 
@@ -116,24 +134,24 @@ function App() {
               <QuizView 
                 currentQuestionNumber={currentAnswers.length + 1}
                 onAnswerSubmit={handleAnswerSubmit}
-                difficulty={difficulty || 'medium'}
-                onDifficultyChange={setDifficulty}
+                difficulty={difficulty}
+                onDifficultyChange={handleDifficultyChange}
               />
             ) : (
               <ResultsView
                 answers={currentAnswers}
                 onStartNewQuiz={handleStartNewQuiz}
-                difficulty={difficulty || 'medium'}
+                difficulty={difficulty}
               />
             )}
           </TabsContent>
 
           <TabsContent value="progress" className="mt-0">
-            <ProgressView sessions={sessions || []} />
+            <ProgressView sessions={sessions} />
           </TabsContent>
 
           <TabsContent value="achievements" className="mt-0">
-            <AchievementsView sessions={sessions || []} />
+            <AchievementsView sessions={sessions} />
           </TabsContent>
         </Tabs>
       </div>

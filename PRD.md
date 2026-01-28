@@ -53,11 +53,11 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Success criteria**: Clear visual hierarchy, positive framing (e.g., "7 correct!" not "3 wrong"), smooth transition
 
 ### Historical Progress Analytics
-- **Functionality**: Displays all-time statistics including total quizzes, accuracy trend, speed improvement, current streak indicator, with difficulty level indicators
+- **Functionality**: Displays all-time statistics including total quizzes, accuracy trend, speed improvement, current streak indicator, with difficulty level indicators. All data stored locally using IndexedDB for offline-first functionality
 - **Purpose**: Demonstrates long-term growth and motivates continued practice across all difficulty levels
 - **Trigger**: User taps "Progress" button/tab
 - **Progression**: User navigates to progress view → Chart shows accuracy over last 10 sessions → Stats cards show total correct/total attempted → Average time trend displayed → Current streak displayed with fire emojis if active → Best score highlighted → Recent quizzes list shows difficulty badge for each session
-- **Success criteria**: Data persists across sessions, visualizations are child-friendly, growth is emphasized over raw scores, difficulty levels are clearly indicated, streak is prominently displayed
+- **Success criteria**: Data persists across sessions using IndexedDB, visualizations are child-friendly, growth is emphasized over raw scores, difficulty levels are clearly indicated, streak is prominently displayed, works offline
 
 ### Achievement Badge System
 - **Functionality**: Tracks and displays achievement badges across multiple categories (milestones, streaks, mastery, speed) with rarity levels
@@ -87,6 +87,7 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 
 ## Edge Case Handling
 
+- **IndexedDB Unavailable**: Gracefully fallback with error message if browser doesn't support IndexedDB
 - **Difficulty Changes Mid-Quiz**: Difficulty is locked once quiz starts; can only be changed when starting a new quiz
 - **Rapid Button Clicking**: Disable answer buttons after first selection until next question loads to prevent double-answers
 - **App Minimization**: Pause timer when app loses focus and resume when returning, or invalidate that question
@@ -98,6 +99,7 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Multiple Achievement Unlocks**: Queue achievements and display them one at a time with 5-second intervals
 - **Locked Achievements**: Show progress bars for multi-step achievements to indicate how close user is to unlocking
 - **Achievement Notification Overlap**: Auto-dismiss after 5 seconds, allow manual dismissal by clicking
+- **Data Migration**: Handle transition from previous storage method to IndexedDB seamlessly
 
 ## Design Direction
 
