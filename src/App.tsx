@@ -5,6 +5,7 @@ import { ResultsView } from '@/components/quiz/ResultsView'
 import { ProgressView } from '@/components/analytics/ProgressView'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartLine, GameController } from '@phosphor-icons/react'
+import { Difficulty } from '@/lib/mathGenerator'
 
 export interface QuizAnswer {
   questionId: number
@@ -22,6 +23,7 @@ export interface QuizSession {
   completedAt: number
   score: number
   averageTime: number
+  difficulty: Difficulty
 }
 
 function App() {
@@ -29,6 +31,7 @@ function App() {
   const [currentAnswers, setCurrentAnswers] = useState<QuizAnswer[]>([])
   const [isQuizComplete, setIsQuizComplete] = useState(false)
   const [activeTab, setActiveTab] = useState<'quiz' | 'progress'>('quiz')
+  const [difficulty, setDifficulty] = useKV<Difficulty>('selected-difficulty', 'medium')
 
   const handleAnswerSubmit = (answer: QuizAnswer) => {
     const newAnswers = [...currentAnswers, answer]
@@ -45,7 +48,8 @@ function App() {
         answers: newAnswers,
         completedAt: Date.now(),
         score,
-        averageTime
+        averageTime,
+        difficulty: difficulty || 'medium'
       }
 
       setSessions((current) => [...(current || []), newSession])
@@ -85,11 +89,14 @@ function App() {
               <QuizView 
                 currentQuestionNumber={currentAnswers.length + 1}
                 onAnswerSubmit={handleAnswerSubmit}
+                difficulty={difficulty || 'medium'}
+                onDifficultyChange={setDifficulty}
               />
             ) : (
               <ResultsView
                 answers={currentAnswers}
                 onStartNewQuiz={handleStartNewQuiz}
+                difficulty={difficulty || 'medium'}
               />
             )}
           </TabsContent>

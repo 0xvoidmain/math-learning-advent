@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Trophy, TrendUp, Target, Clock } from '@phosphor-icons/react'
 import { QuizSession } from '@/App'
 import { ProgressChart } from './ProgressChart'
+import { Difficulty } from '@/lib/mathGenerator'
 
 interface ProgressViewProps {
   sessions: QuizSession[]
@@ -59,6 +60,18 @@ export function ProgressView({ sessions }: ProgressViewProps) {
   const timeImprovement = firstSessionAvgTime > 0 
     ? Math.round(((firstSessionAvgTime - lastSessionAvgTime) / firstSessionAvgTime) * 100)
     : 0
+
+  const difficultyLabels: Record<Difficulty, string> = {
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard'
+  }
+
+  const difficultyColors: Record<Difficulty, string> = {
+    easy: 'bg-success text-accent-foreground',
+    medium: 'bg-secondary text-secondary-foreground',
+    hard: 'bg-coral text-white'
+  }
 
   return (
     <motion.div
@@ -224,6 +237,11 @@ export function ProgressView({ sessions }: ProgressViewProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Badge 
+                      className={`text-xs ${difficultyColors[session.difficulty || 'medium']}`}
+                    >
+                      {difficultyLabels[session.difficulty || 'medium']}
+                    </Badge>
                     <Badge 
                       variant={session.score >= 7 ? 'default' : 'secondary'}
                       className={session.score >= 7 ? 'bg-success text-accent-foreground' : ''}

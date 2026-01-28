@@ -12,12 +12,24 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 
 ## Essential Features
 
+### Difficulty Selection
+- **Functionality**: Allows users to select from three difficulty levels (Easy, Medium, Hard) before starting a quiz
+- **Purpose**: Provides appropriate challenge for different skill levels and enables progressive learning
+- **Trigger**: Displays on first question of each new quiz
+- **Progression**: Quiz starts → Difficulty selector appears with three buttons → User taps difficulty level → Selection is saved → Quiz proceeds with selected difficulty
+- **Success criteria**: Difficulty persists across quiz, stored with session data, clear visual distinction between levels
+
 ### Quiz Question Display
-- **Functionality**: Presents a math problem (addition, subtraction, multiplication) with four multiple choice answers
+- **Functionality**: Presents a math problem (addition, subtraction, multiplication) with four multiple choice answers, adjusted for selected difficulty
 - **Purpose**: Provides the core learning interaction with appropriate difficulty
 - **Trigger**: App launch or completing previous question
 - **Progression**: App loads → Shows question with large numbers → Displays 4 answer buttons below → Waits for user selection
-- **Success criteria**: Question is clearly visible, one correct answer among three plausible distractors, math operations are grade-appropriate
+- **Success criteria**: Question is clearly visible, one correct answer among three plausible distractors, math operations are grade-appropriate for selected difficulty level
+
+**Difficulty Ranges:**
+- **Easy**: Addition/Subtraction (1-20), Multiplication (2-5)
+- **Medium**: Addition/Subtraction (10-50), Multiplication (2-10)
+- **Hard**: Addition/Subtraction (25-100), Multiplication (5-15)
 
 ### Answer Selection & Feedback
 - **Functionality**: User taps an answer button, system validates and provides immediate visual/animated feedback
@@ -41,11 +53,11 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Success criteria**: Clear visual hierarchy, positive framing (e.g., "7 correct!" not "3 wrong"), smooth transition
 
 ### Historical Progress Analytics
-- **Functionality**: Displays all-time statistics including total quizzes, accuracy trend, speed improvement
-- **Purpose**: Demonstrates long-term growth and motivates continued practice
+- **Functionality**: Displays all-time statistics including total quizzes, accuracy trend, speed improvement, with difficulty level indicators
+- **Purpose**: Demonstrates long-term growth and motivates continued practice across all difficulty levels
 - **Trigger**: User taps "Progress" button/tab
-- **Progression**: User navigates to progress view → Chart shows accuracy over last 10 sessions → Stats cards show total correct/total attempted → Average time trend displayed → Best score highlighted
-- **Success criteria**: Data persists across sessions, visualizations are child-friendly, growth is emphasized over raw scores
+- **Progression**: User navigates to progress view → Chart shows accuracy over last 10 sessions → Stats cards show total correct/total attempted → Average time trend displayed → Best score highlighted → Recent quizzes list shows difficulty badge for each session
+- **Success criteria**: Data persists across sessions, visualizations are child-friendly, growth is emphasized over raw scores, difficulty levels are clearly indicated
 
 ### Quiz Restart
 - **Functionality**: Allows user to start a new 10-question session
@@ -56,12 +68,14 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 
 ## Edge Case Handling
 
+- **Difficulty Changes Mid-Quiz**: Difficulty is locked once quiz starts; can only be changed when starting a new quiz
 - **Rapid Button Clicking**: Disable answer buttons after first selection until next question loads to prevent double-answers
 - **App Minimization**: Pause timer when app loses focus and resume when returning, or invalidate that question
 - **No Historical Data**: Show encouraging "Start your first quiz!" message instead of empty charts
 - **Slow Response Times**: Cap recorded times at 60 seconds and show gentle encouragement without highlighting slowness
 - **All Incorrect Answers**: Results screen emphasizes "Great effort!" and "Let's try again" rather than focusing on mistakes
 - **Duplicate Questions**: Ensure random generation doesn't repeat the same problem within a session
+- **Legacy Sessions Without Difficulty**: Default to 'medium' difficulty for old sessions without difficulty data
 
 ## Design Direction
 

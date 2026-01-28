@@ -5,16 +5,30 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Trophy, Clock, CheckCircle, ArrowClockwise } from '@phosphor-icons/react'
 import { QuizAnswer } from '@/App'
+import { Difficulty } from '@/lib/mathGenerator'
 
 interface ResultsViewProps {
   answers: QuizAnswer[]
   onStartNewQuiz: () => void
+  difficulty: Difficulty
 }
 
-export function ResultsView({ answers, onStartNewQuiz }: ResultsViewProps) {
+export function ResultsView({ answers, onStartNewQuiz, difficulty }: ResultsViewProps) {
   const score = answers.filter(a => a.isCorrect).length
   const averageTime = answers.reduce((sum, a) => sum + a.responseTime, 0) / answers.length
   const averageTimeSeconds = (averageTime / 1000).toFixed(1)
+
+  const difficultyLabels: Record<Difficulty, string> = {
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard'
+  }
+
+  const difficultyColors: Record<Difficulty, string> = {
+    easy: 'bg-success text-accent-foreground',
+    medium: 'bg-secondary text-secondary-foreground',
+    hard: 'bg-coral text-white'
+  }
 
   const getEncouragingMessage = (score: number) => {
     if (score === 10) return "Perfect score! You're a math superstar! 🌟"
@@ -54,9 +68,12 @@ export function ResultsView({ answers, onStartNewQuiz }: ResultsViewProps) {
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             Quiz Complete!
           </h2>
-          <p className="text-lg sm:text-xl text-muted-foreground">
+          <p className="text-lg sm:text-xl text-muted-foreground mb-3">
             {getEncouragingMessage(score)}
           </p>
+          <Badge className={`${difficultyColors[difficulty]} text-sm px-3 py-1`}>
+            {difficultyLabels[difficulty]} Level
+          </Badge>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

@@ -2,27 +2,30 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { Button } from '@/components/ui/button'
 import { AnswerButton } from './AnswerButton'
-import { generateQuestion, type MathQuestion } from '@/lib/mathGenerator'
+import { generateQuestion, type MathQuestion, type Difficulty } from '@/lib/mathGenerator'
 import { QuizAnswer } from '@/App'
 
 interface QuizViewProps {
   currentQuestionNumber: number
   onAnswerSubmit: (answer: QuizAnswer) => void
+  difficulty: Difficulty
+  onDifficultyChange: (difficulty: Difficulty) => void
 }
 
-export function QuizView({ currentQuestionNumber, onAnswerSubmit }: QuizViewProps) {
-  const [question, setQuestion] = useState<MathQuestion>(generateQuestion())
+export function QuizView({ currentQuestionNumber, onAnswerSubmit, difficulty, onDifficultyChange }: QuizViewProps) {
+  const [question, setQuestion] = useState<MathQuestion>(generateQuestion(difficulty))
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [startTime, setStartTime] = useState(Date.now())
   const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
-    setQuestion(generateQuestion())
+    setQuestion(generateQuestion(difficulty))
     setStartTime(Date.now())
     setSelectedAnswer(null)
     setIsProcessing(false)
-  }, [currentQuestionNumber])
+  }, [currentQuestionNumber, difficulty])
 
   const handleAnswerClick = async (answer: number) => {
     if (isProcessing || selectedAnswer !== null) return
@@ -50,6 +53,18 @@ export function QuizView({ currentQuestionNumber, onAnswerSubmit }: QuizViewProp
 
   const progressPercent = ((currentQuestionNumber - 1) / 10) * 100
 
+  const difficultyLabels: Record<Difficulty, string> = {
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard'
+  }
+
+  const difficultyColors: Record<Difficulty, string> = {
+    easy: 'bg-success text-accent-foreground',
+    medium: 'bg-secondary text-secondary-foreground',
+    hard: 'bg-coral text-white'
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,6 +73,25 @@ export function QuizView({ currentQuestionNumber, onAnswerSubmit }: QuizViewProp
       transition={{ duration: 0.3 }}
     >
       <Card className="p-6 sm:p-8 shadow-xl">
+        {currentQuestionNumber === 1 && (
+          <div className="mb-6">
+            <p className="text-sm font-medium text-muted-foreground mb-3">Select Difficulty:</p>
+            <div className="flex gap-2">
+              {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => (
+                <Button
+                  key={level}
+                  variant={difficulty === level ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => onDifficultyChange(level)}
+                  className={difficulty === level ? difficultyColors[level] : ''}
+                >
+                  {difficultyLabels[level]}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">
