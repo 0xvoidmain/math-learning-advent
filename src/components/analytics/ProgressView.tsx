@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Trophy, TrendUp, Target, Clock } from '@phosphor-icons/react'
+import { Trophy, TrendUp, Target, Clock, Fire } from '@phosphor-icons/react'
 import { QuizSession } from '@/App'
 import { ProgressChart } from './ProgressChart'
 import { Difficulty } from '@/lib/mathGenerator'
@@ -60,6 +60,15 @@ export function ProgressView({ sessions }: ProgressViewProps) {
   const timeImprovement = firstSessionAvgTime > 0 
     ? Math.round(((firstSessionAvgTime - lastSessionAvgTime) / firstSessionAvgTime) * 100)
     : 0
+
+  let currentStreak = 0
+  for (let i = sessions.length - 1; i >= 0; i--) {
+    if (sessions[i].score >= 8) {
+      currentStreak++
+    } else {
+      break
+    }
+  }
 
   const difficultyLabels: Record<Difficulty, string> = {
     easy: 'Easy',
@@ -161,6 +170,60 @@ export function ProgressView({ sessions }: ProgressViewProps) {
             </Card>
           </motion.div>
         </div>
+
+        {currentStreak > 0 && (
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.45 }}
+            className="mb-8"
+          >
+            <Card className="p-4 bg-gradient-to-r from-red-500/10 via-orange-500/10 to-yellow-500/10 border-orange-500/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ 
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 1
+                    }}
+                  >
+                    <Fire weight="fill" className="w-8 h-8 text-orange-500" />
+                  </motion.div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                      Current Streak
+                    </p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {currentStreak} quiz{currentStreak !== 1 ? 'zes' : ''} with 8+ score!
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  {[...Array(Math.min(currentStreak, 10))].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.5 + i * 0.05 }}
+                    >
+                      <Fire weight="fill" className="w-5 h-5 text-orange-500" />
+                    </motion.div>
+                  ))}
+                  {currentStreak > 10 && (
+                    <span className="text-sm font-bold text-orange-500 ml-1">
+                      +{currentStreak - 10}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ y: 20, opacity: 0 }}

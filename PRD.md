@@ -53,11 +53,30 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Success criteria**: Clear visual hierarchy, positive framing (e.g., "7 correct!" not "3 wrong"), smooth transition
 
 ### Historical Progress Analytics
-- **Functionality**: Displays all-time statistics including total quizzes, accuracy trend, speed improvement, with difficulty level indicators
+- **Functionality**: Displays all-time statistics including total quizzes, accuracy trend, speed improvement, current streak indicator, with difficulty level indicators
 - **Purpose**: Demonstrates long-term growth and motivates continued practice across all difficulty levels
 - **Trigger**: User taps "Progress" button/tab
-- **Progression**: User navigates to progress view → Chart shows accuracy over last 10 sessions → Stats cards show total correct/total attempted → Average time trend displayed → Best score highlighted → Recent quizzes list shows difficulty badge for each session
-- **Success criteria**: Data persists across sessions, visualizations are child-friendly, growth is emphasized over raw scores, difficulty levels are clearly indicated
+- **Progression**: User navigates to progress view → Chart shows accuracy over last 10 sessions → Stats cards show total correct/total attempted → Average time trend displayed → Current streak displayed with fire emojis if active → Best score highlighted → Recent quizzes list shows difficulty badge for each session
+- **Success criteria**: Data persists across sessions, visualizations are child-friendly, growth is emphasized over raw scores, difficulty levels are clearly indicated, streak is prominently displayed
+
+### Achievement Badge System
+- **Functionality**: Tracks and displays achievement badges across multiple categories (milestones, streaks, mastery, speed) with rarity levels
+- **Purpose**: Gamifies learning experience, provides additional motivation, celebrates accomplishments beyond just quiz scores
+- **Trigger**: User completes quiz or navigates to "Badges" tab
+- **Progression**: User completes quiz → System checks for newly unlocked achievements → Animated notification appears at top of screen → Achievement saved to user profile → User can view all achievements in dedicated tab → Locked achievements show progress bars
+- **Success criteria**: Achievements unlock reliably based on criteria, notifications are celebratory and engaging, progress towards locked achievements is clear, badges are visually distinctive by rarity
+
+**Achievement Categories:**
+- **Milestones**: Complete 1, 5, 10, 25, 50, 100 quizzes
+- **Streaks**: Maintain 3, 5, or 10 consecutive quizzes with 8+ score
+- **Mastery**: Perfect scores (1, 3, 10 times), complete all difficulties, hard mode mastery
+- **Speed**: Complete quizzes with average time under 3s or 2s
+
+**Rarity Levels:**
+- **Common**: Basic milestones (gray gradient)
+- **Rare**: Significant achievements (blue gradient)
+- **Epic**: Major accomplishments (purple gradient)
+- **Legendary**: Ultimate mastery (gold gradient with particle effects)
 
 ### Quiz Restart
 - **Functionality**: Allows user to start a new 10-question session
@@ -71,11 +90,14 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Difficulty Changes Mid-Quiz**: Difficulty is locked once quiz starts; can only be changed when starting a new quiz
 - **Rapid Button Clicking**: Disable answer buttons after first selection until next question loads to prevent double-answers
 - **App Minimization**: Pause timer when app loses focus and resume when returning, or invalidate that question
-- **No Historical Data**: Show encouraging "Start your first quiz!" message instead of empty charts
+- **No Historical Data**: Show encouraging "Start your first quiz!" message instead of empty charts and achievement galleries
 - **Slow Response Times**: Cap recorded times at 60 seconds and show gentle encouragement without highlighting slowness
 - **All Incorrect Answers**: Results screen emphasizes "Great effort!" and "Let's try again" rather than focusing on mistakes
 - **Duplicate Questions**: Ensure random generation doesn't repeat the same problem within a session
 - **Legacy Sessions Without Difficulty**: Default to 'medium' difficulty for old sessions without difficulty data
+- **Multiple Achievement Unlocks**: Queue achievements and display them one at a time with 5-second intervals
+- **Locked Achievements**: Show progress bars for multi-step achievements to indicate how close user is to unlocking
+- **Achievement Notification Overlap**: Auto-dismiss after 5 seconds, allow manual dismissal by clicking
 
 ## Design Direction
 
@@ -123,9 +145,9 @@ Animations should create a sense of playfulness and reward, making the app feel 
 - **Components**: 
   - **Card** (shadcn): Main container for quiz questions and results with elevated shadow and rounded corners
   - **Button** (shadcn): All interactive elements with size variants (large for answers, default for navigation)
-  - **Progress** (shadcn): Visual indicator showing question progress (3/10) at top of quiz
-  - **Tabs** (shadcn): Navigation between Quiz and Progress views
-  - **Badge** (shadcn): Display correct/incorrect counts and achievement indicators
+  - **Progress** (shadcn): Visual indicator showing question progress (3/10) at top of quiz, and achievement progress bars
+  - **Tabs** (shadcn): Navigation between Quiz, Progress, and Badges views
+  - **Badge** (shadcn): Display correct/incorrect counts, difficulty levels, achievement indicators, and rarity levels
   - **Separator** (shadcn): Divide sections in analytics view
   
 - **Customizations**: 
@@ -133,6 +155,8 @@ Animations should create a sense of playfulness and reward, making the app feel 
   - **Confetti Component**: Custom particle system using framer-motion for celebration effects
   - **Progress Chart**: Custom D3 line chart with simplified axis and child-friendly styling
   - **Timer Display**: Custom circular progress indicator (hidden during quiz, shown in results)
+  - **Achievement Badge**: Custom card component with gradient borders, rarity indicators, and lock states
+  - **Achievement Unlock Notification**: Animated toast-style notification with particle effects for legendary achievements
   
 - **States**: 
   - **Answer Buttons**: Default (vibrant with border), hover (scale + glow), pressed (scale down), disabled (reduced opacity), correct (green background + icon), incorrect (red background + shake)
@@ -143,7 +167,12 @@ Animations should create a sense of playfulness and reward, making the app feel 
   - Plus/Minus/X from @phosphor-icons for math operations
   - Check/X for correct/incorrect feedback
   - ChartLine for progress analytics
-  - Trophy for achievements
+  - Trophy for achievements and best scores
+  - Fire for streak indicators
+  - Target for accuracy metrics
+  - Lightning for speed achievements
+  - Lock for locked achievements
+  - Sparkle for rarity indicators
   - ArrowClockwise for retry
   
 - **Spacing**: 
@@ -156,5 +185,7 @@ Animations should create a sense of playfulness and reward, making the app feel 
   - Single column layout maintained across all breakpoints
   - Answer buttons stack 2×2 on mobile, remain 2×2 on desktop (optimal for 4 choices)
   - Font sizes scale down 10% on mobile (Math: 48px, Answers: 24px)
-  - Navigation tabs become full-width segmented control on mobile
+  - Navigation tabs become full-width segmented control on mobile (3 tabs: Quiz, Progress, Badges)
   - Charts adjust height and simplify labels on narrow viewports
+  - Achievement badges stack vertically on mobile with appropriate touch targets
+  - Achievement unlock notifications are responsive and centered on all screen sizes

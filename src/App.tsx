@@ -3,9 +3,12 @@ import { useKV } from '@github/spark/hooks'
 import { QuizView } from '@/components/quiz/QuizView'
 import { ResultsView } from '@/components/quiz/ResultsView'
 import { ProgressView } from '@/components/analytics/ProgressView'
+import { AchievementsView } from '@/components/analytics/AchievementsView'
+import { AchievementUnlock } from '@/components/analytics/AchievementUnlock'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ChartLine, GameController } from '@phosphor-icons/react'
+import { ChartLine, GameController, Trophy } from '@phosphor-icons/react'
 import { Difficulty } from '@/lib/mathGenerator'
+import { getNewlyUnlockedAchievements, Achievement } from '@/lib/achievements'
 
 export interface QuizAnswer {
   questionId: number
@@ -30,8 +33,10 @@ function App() {
   const [sessions, setSessions] = useKV<QuizSession[]>('quiz-sessions', [])
   const [currentAnswers, setCurrentAnswers] = useState<QuizAnswer[]>([])
   const [isQuizComplete, setIsQuizComplete] = useState(false)
-  const [activeTab, setActiveTab] = useState<'quiz' | 'progress'>('quiz')
+  const [activeTab, setActiveTab] = useState<'quiz' | 'progress' | 'achievements'>('quiz')
   const [difficulty, setDifficulty] = useKV<Difficulty>('selected-difficulty', 'medium')
+  const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null)
+  const [achievementQueue, setAchievementQueue] = useState<Achievement[]>([])
 
   const handleAnswerSubmit = (answer: QuizAnswer) => {
     const newAnswers = [...currentAnswers, answer]
@@ -52,8 +57,28 @@ function App() {
         difficulty: difficulty || 'medium'
       }
 
-      setSessions((current) => [...(current || []), newSession])
+      setSessions((current) => {
+        const updated = [...(current || []), newSession]
+        
+        const newAchievements = getNewlyUnlockedAchievements(current || [], updated)
+        if (newAchievements.length > 0) {
+          setAchievementQueue(newAchievements)
+        }
+        
+        return updated
+      })
     }
+  }
+
+  useEffect(() => {
+    if (achievementQueue.length > 0 && !unlockedAchievement) {
+      setUnlockedAchievement(achievementQueue[0])
+    }
+  }, [achievementQueue, unlockedAchievement])
+
+  const handleDismissAchievement = () => {
+    setUnlockedAchievement(null)
+    setAchievementQueue((current) => current.slice(1))
   }
 
   const handleStartNewQuiz = () => {
@@ -64,6 +89,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
+      <AchievementUnlock 
+        achievement={unlockedAchievement} 
+        onDismiss={handleDismissAchievement}
+      />
+      
       <div className="max-w-3xl mx-auto">
         <header className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-2">
@@ -72,8 +102,8 @@ function App() {
           <p className="text-lg text-muted-foreground">Learn, Practice, Grow! 🚀</p>
         </header>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'quiz' | 'progress')} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'quiz' | 'progress' | 'achievements')} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="quiz" className="text-base sm:text-lg gap-2">
               <GameController weight="fill" className="w-5 h-5" />
               Quiz
@@ -81,6 +111,10 @@ function App() {
             <TabsTrigger value="progress" className="text-base sm:text-lg gap-2">
               <ChartLine weight="fill" className="w-5 h-5" />
               Progress
+            </TabsTrigger>
+            <TabsTrigger value="achievements" className="text-base sm:text-lg gap-2">
+              <Trophy weight="fill" className="w-5 h-5" />
+              Badges
             </TabsTrigger>
           </TabsList>
 
@@ -103,6 +137,10 @@ function App() {
 
           <TabsContent value="progress" className="mt-0">
             <ProgressView sessions={sessions || []} />
+          </TabsContent>
+
+          <TabsContent value="achievements" className="mt-0">
+            <AchievementsView sessions={sessions || []} />
           </TabsContent>
         </Tabs>
       </div>
