@@ -42,7 +42,7 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
 
     const margin = { top: 20, right: 20, bottom: 40, left: 40 }
     const width = svgRef.current.clientWidth - margin.left - margin.right
-    const height = 200 - margin.top - margin.bottom
+    const height = 150 - margin.top - margin.bottom
 
     const g = svg
       .append('g')
@@ -116,7 +116,10 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
       .attr('cx', d => xScale(d.index))
       .attr('cy', d => yScale(d.score))
       .attr('r', 0)
-      .attr('fill', d => d.score >= 7 ? 'hsl(var(--success))' : 'hsl(var(--primary))')
+      .attr('fill', (d, i) => {
+        const opacity = 0.3 + (i / (data.length - 1)) * 0.7
+        return `rgba(59, 130, 246, ${opacity})`
+      })
       .attr('stroke', 'hsl(var(--background))')
       .attr('stroke-width', 2)
       .style('cursor', 'pointer')
@@ -132,16 +135,66 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
           .duration(200)
           .attr('r', 7)
       })
-      .on('mouseleave', function() {
+      .on('mouseleave', function(event, d) {
+        const isLatest = d.index === data.length
         d3.select(this)
           .transition()
           .duration(200)
-          .attr('r', 5)
+          .attr('r', isLatest ? 6 : 5)
       })
       .transition()
       .delay((d, i) => i * 100 + 500)
       .duration(300)
-      .attr('r', 5)
+      .attr('r', (d, i) => i === data.length - 1 ? 6 : 5)
+
+    if (data.length > 1) {
+      const latestScore = data[data.length - 1].score
+      const previousScore = data[data.length - 2].score
+      const isImprovement = latestScore > previousScore
+      const isDecline = latestScore < previousScore
+      
+      if (isImprovement || isDecline) {
+        const latestDot = g.selectAll('.dot').filter((d: any, i: number) => i === data.length - 1)
+        
+        latestDot
+          .transition()
+          .delay(500 + data.length * 100)
+          .duration(300)
+          .attr('r', 8)
+          .transition()
+          .duration(300)
+          .attr('r', 6)
+          .transition()
+          .duration(300)
+          .attr('r', 8)
+          .transition()
+          .duration(300)
+          .attr('r', 6)
+
+        const emoji = isImprovement ? '🎉' : '💪'
+        const emojiGroup = g.append('g')
+          .attr('class', 'emoji-indicator')
+        
+        const latestData = data[data.length - 1]
+        emojiGroup.append('text')
+          .attr('x', xScale(latestData.index))
+          .attr('y', yScale(latestData.score) - 15)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '24px')
+          .attr('opacity', 0)
+          .text(emoji)
+          .transition()
+          .delay(500 + data.length * 100 + 300)
+          .duration(400)
+          .attr('opacity', 1)
+          .attr('y', yScale(latestData.score) - 25)
+          .transition()
+          .duration(300)
+          .attr('opacity', 0)
+          .attr('y', yScale(latestData.score) - 35)
+          .remove()
+      }
+    }
 
   }, [sessions])
 
@@ -150,7 +203,7 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
       <svg
         ref={svgRef}
         width="100%"
-        height="200"
+        height="150"
         className="overflow-visible"
       />
       <AnimatePresence>
