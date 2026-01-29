@@ -94,16 +94,13 @@ export function InstallGuide() {
                     <div className="flex items-start gap-2">
                       <span className="font-semibold text-primary shrink-0">1.</span>
                       <div className="flex items-center gap-2">
-                        <span>Tap the Share button</span>
+                        <span>Click the Share button</span>
                         <ShareFat weight="fill" className="w-4 h-4 text-primary" />
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-semibold text-primary shrink-0">2.</span>
-                      <div className="flex items-center gap-2">
-                        <span>Tap "Add to Home Screen"</span>
-                        <Plus weight="bold" className="w-4 h-4 text-primary" />
-                      </div>
+                      <span>Scroll down and select "Add to Home Screen"</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-semibold text-primary shrink-0">3.</span>
@@ -117,17 +114,17 @@ export function InstallGuide() {
                     <div className="flex items-start gap-2">
                       <span className="font-semibold text-primary shrink-0">1.</span>
                       <div className="flex items-center gap-2">
-                        <span>Tap the menu button</span>
-                        <DotsThreeVertical weight="bold" className="w-4 h-4 text-primary" />
+                        <span>Click the Share button</span>
+                        <ShareFat weight="fill" className="w-4 h-4 text-primary" />
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-semibold text-primary shrink-0">2.</span>
-                      <span>Tap "Add to Home screen" or "Install app"</span>
+                      <span>Scroll down and select "Add to Home Screen"</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-semibold text-primary shrink-0">3.</span>
-                      <span>Tap "Add" or "Install"</span>
+                      <span>Tap "Add"</span>
                     </div>
                   </div>
                 )}
