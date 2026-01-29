@@ -2,20 +2,21 @@
   "name": "Math Quest - Learn & Grow",
   "short_name": "Math Quest",
   "description": "A fun and engaging math practice app for children with gamified quizzes and progress tracking",
-  "start_url": "/",
+  "start_url": "/math-learning-advent/",
+  "scope": "/math-learning-advent/",
   "display": "standalone",
   "background_color": "#faf8f5",
   "theme_color": "#9747FF",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.svg",
+      "src": "/math-learning-advent/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.svg",
+      "src": "/math-learning-advent/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
