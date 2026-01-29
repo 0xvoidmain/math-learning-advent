@@ -93,7 +93,9 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
       .datum(data)
       .attr('fill', 'none')
       .attr('stroke', 'hsl(var(--primary))')
-      .attr('stroke-width', 3)
+      .attr('stroke-width', 2.5)
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round')
       .attr('d', line)
 
     const totalLength = path.node()?.getTotalLength() || 0
