@@ -31,7 +31,7 @@ export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockP
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -100, scale: 0.8 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-full mx-4"
+          className="fixed top-4 left-4 right-4 z-50 max-w-md mx-auto"
           onClick={onDismiss}
         >
           <motion.div
