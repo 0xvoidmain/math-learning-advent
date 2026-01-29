@@ -4,6 +4,7 @@ import { ResultsView } from '@/components/quiz/ResultsView'
 import { ProgressView } from '@/components/analytics/ProgressView'
 import { AchievementsView } from '@/components/analytics/AchievementsView'
 import { AchievementUnlock } from '@/components/analytics/AchievementUnlock'
+import { InstallGuide } from '@/components/InstallGuide'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartLine, GameController, Trophy } from '@phosphor-icons/react'
 import { Difficulty } from '@/lib/mathGenerator'
@@ -107,6 +108,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
+      <InstallGuide />
+      
       <AchievementUnlock 
         achievement={unlockedAchievement} 
         onDismiss={handleDismissAchievement}

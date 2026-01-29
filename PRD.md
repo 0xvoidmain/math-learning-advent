@@ -85,6 +85,13 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Progression**: User taps "New Quiz" button → Current progress is saved to history → New session begins → First question appears
 - **Success criteria**: Previous data is preserved, new session starts immediately, no confirmation dialogs
 
+### PWA Install Guide
+- **Functionality**: Displays a helpful guide showing users how to install the app on their home screen for standalone mode
+- **Purpose**: Improves user experience by enabling app-like usage with quick access from home screen
+- **Trigger**: Appears 3 seconds after first load if user hasn't dismissed it and isn't already in standalone mode
+- **Progression**: User loads app → After 3 seconds, guide card slides up from bottom → Shows device-specific instructions (iOS/Android/Desktop) → User can dismiss or follow instructions → Once dismissed, never shows again
+- **Success criteria**: Guide only shows once, detects device type correctly, provides accurate instructions, stores dismissal state in IndexedDB, doesn't show if already in standalone mode
+
 ## Edge Case Handling
 
 - **IndexedDB Unavailable**: Gracefully fallback with error message if browser doesn't support IndexedDB
@@ -100,6 +107,9 @@ This is a focused educational tool with quiz mechanics, session analytics, and h
 - **Locked Achievements**: Show progress bars for multi-step achievements to indicate how close user is to unlocking
 - **Achievement Notification Overlap**: Auto-dismiss after 5 seconds, allow manual dismissal by clicking
 - **Data Migration**: Handle transition from previous storage method to IndexedDB seamlessly
+- **Install Guide Already Dismissed**: Never show install guide again once user dismisses it
+- **Already in Standalone Mode**: Don't show install guide if app is already running in standalone/installed mode
+- **Multiple Tabs**: Install guide dismissal is shared across all tabs via IndexedDB
 
 ## Design Direction
 
@@ -159,6 +169,7 @@ Animations should create a sense of playfulness and reward, making the app feel 
   - **Timer Display**: Custom circular progress indicator (hidden during quiz, shown in results)
   - **Achievement Badge**: Custom card component with gradient borders, rarity indicators, and lock states
   - **Achievement Unlock Notification**: Animated toast-style notification with particle effects for legendary achievements
+  - **Install Guide Card**: Animated card component with device-specific instructions, appears from bottom with slide animation
   
 - **States**: 
   - **Answer Buttons**: Default (vibrant with border), hover (scale + glow), pressed (scale down), disabled (reduced opacity), correct (green background + icon), incorrect (red background + shake)
@@ -176,6 +187,10 @@ Animations should create a sense of playfulness and reward, making the app feel 
   - Lock for locked achievements
   - Sparkle for rarity indicators
   - ArrowClockwise for retry
+  - DeviceMobile for install guide icon
+  - ShareFat for iOS share button
+  - Plus for add to home screen
+  - DotsThreeVertical for Android menu
   
 - **Spacing**: 
   - Page padding: p-6 (24px)
