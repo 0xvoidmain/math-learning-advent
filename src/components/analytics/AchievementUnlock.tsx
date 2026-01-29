@@ -1,27 +1,35 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { Achievement } from '@/lib/achievements'
-import { Trophy, Sparkle } from '@phosphor-icons/react'
-import { useEffect } from 'react'
+import { motion, AnimatePresence } from "framer-motion";
+import { Achievement } from "@/lib/achievements";
+import { Trophy, Sparkle } from "@phosphor-icons/react";
+import { useEffect } from "react";
+import { useSound } from "@/hooks/use-sound";
 
 interface AchievementUnlockProps {
-  achievement: Achievement | null
-  onDismiss: () => void
+  achievement: Achievement | null;
+  onDismiss: () => void;
 }
 
 const rarityColors = {
-  common: 'from-gray-400 to-gray-500',
-  rare: 'from-blue-400 to-blue-600',
-  epic: 'from-purple-400 to-purple-600',
-  legendary: 'from-yellow-400 to-yellow-600'
-}
+  common: "from-gray-400 to-gray-500",
+  rare: "from-blue-400 to-blue-600",
+  epic: "from-purple-400 to-purple-600",
+  legendary: "from-yellow-400 to-yellow-600",
+};
 
-export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockProps) {
+export function AchievementUnlock({
+  achievement,
+  onDismiss,
+}: AchievementUnlockProps) {
+  const { playSound } = useSound();
+
   useEffect(() => {
     if (achievement) {
-      const timer = setTimeout(onDismiss, 5000)
-      return () => clearTimeout(timer)
+      // Play achievement sound when achievement appears
+      playSound("achievement");
+      const timer = setTimeout(onDismiss, 5000);
+      return () => clearTimeout(timer);
     }
-  }, [achievement, onDismiss])
+  }, [achievement, onDismiss, playSound]);
 
   return (
     <AnimatePresence>
@@ -30,16 +38,19 @@ export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockP
           initial={{ opacity: 0, y: -100, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -100, scale: 0.8 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="fixed top-4 left-4 right-4 z-50 max-w-md mx-auto"
-          onClick={onDismiss}
+          onClick={() => {
+            playSound("achievement");
+            onDismiss();
+          }}
         >
           <motion.div
             animate={{
               boxShadow: [
-                '0 10px 40px rgba(0,0,0,0.2)',
-                '0 10px 60px rgba(0,0,0,0.3)',
-                '0 10px 40px rgba(0,0,0,0.2)',
+                "0 10px 40px rgba(0,0,0,0.2)",
+                "0 10px 60px rgba(0,0,0,0.3)",
+                "0 10px 40px rgba(0,0,0,0.2)",
               ],
             }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -54,9 +65,9 @@ export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockP
                 className="absolute inset-0 opacity-10"
                 animate={{
                   background: [
-                    'radial-gradient(circle at 0% 0%, white 0%, transparent 50%)',
-                    'radial-gradient(circle at 100% 100%, white 0%, transparent 50%)',
-                    'radial-gradient(circle at 0% 0%, white 0%, transparent 50%)',
+                    "radial-gradient(circle at 0% 0%, white 0%, transparent 50%)",
+                    "radial-gradient(circle at 100% 100%, white 0%, transparent 50%)",
+                    "radial-gradient(circle at 0% 0%, white 0%, transparent 50%)",
                   ],
                 }}
                 transition={{ duration: 3, repeat: Infinity }}
@@ -66,7 +77,11 @@ export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockP
                 <div className="flex items-center gap-3 mb-3">
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                    transition={{
+                      duration: 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                    }}
                   >
                     <Trophy weight="fill" className="w-8 h-8 text-yellow-500" />
                   </motion.div>
@@ -99,26 +114,29 @@ export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockP
                     <p className="text-sm text-muted-foreground mb-2">
                       {achievement.description}
                     </p>
-                    <div className={`
+                    <div
+                      className={`
                       inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold
                       bg-gradient-to-r ${rarityColors[achievement.rarity]} text-white
-                    `}>
+                    `}
+                    >
                       <Sparkle weight="fill" className="w-3 h-3" />
-                      {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
+                      {achievement.rarity.charAt(0).toUpperCase() +
+                        achievement.rarity.slice(1)}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {achievement.rarity === 'legendary' && (
+              {achievement.rarity === "legendary" && (
                 <>
                   {[...Array(20)].map((_, i) => (
                     <motion.div
                       key={i}
                       className="absolute w-2 h-2 bg-yellow-400 rounded-full"
                       initial={{
-                        x: '50%',
-                        y: '50%',
+                        x: "50%",
+                        y: "50%",
                         scale: 0,
                         opacity: 1,
                       }}
@@ -143,5 +161,5 @@ export function AchievementUnlock({ achievement, onDismiss }: AchievementUnlockP
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }
