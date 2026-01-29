@@ -3,15 +3,16 @@ import * as d3 from 'd3'
 import { QuizSession } from '@/App'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { X } from '@phosphor-icons/react'
 import { Difficulty } from '@/lib/mathGenerator'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface ProgressChartProps {
   sessions: QuizSession[]
 }
 
 interface TooltipData {
-  x: number
-  y: number
   session: QuizSession
   index: number
 }
@@ -118,16 +119,10 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
       .attr('stroke-width', 2)
       .style('cursor', 'pointer')
       .on('click', function(event, d) {
-        const containerRect = containerRef.current?.getBoundingClientRect()
-        const svgRect = svgRef.current?.getBoundingClientRect()
-        if (containerRect && svgRect) {
-          setTooltip({
-            x: event.clientX - containerRect.left,
-            y: event.clientY - containerRect.top,
-            session: d.session,
-            index: d.index
-          })
-        }
+        setTooltip({
+          session: d.session,
+          index: d.index
+        })
       })
       .on('mouseenter', function() {
         d3.select(this)
@@ -156,64 +151,81 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
         height="200"
         className="overflow-visible"
       />
-      {tooltip && (
-        <>
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setTooltip(null)}
-          />
-          <Card 
-            className="absolute z-50 p-4 shadow-xl min-w-64 max-w-xs"
-            style={{
-              left: `${tooltip.x}px`,
-              top: `${tooltip.y}px`,
-              transform: 'translate(-50%, -120%)'
-            }}
-          >
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-foreground">
-                  Quiz #{tooltip.index}
-                </h4>
-                <Badge className={difficultyColors[tooltip.session.difficulty || 'medium']}>
-                  {difficultyLabels[tooltip.session.difficulty || 'medium']}
-                </Badge>
-              </div>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Score:</span>
-                  <span className="font-semibold text-foreground">
-                    {tooltip.session.score}/10
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Accuracy:</span>
-                  <span className="font-semibold text-foreground">
-                    {(tooltip.session.score * 10)}%
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Avg Time:</span>
-                  <span className="font-semibold text-foreground">
-                    {(tooltip.session.averageTime / 1000).toFixed(1)}s
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Date:</span>
-                  <span className="font-semibold text-foreground">
-                    {new Date(tooltip.session.completedAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </>
-      )}
+      <AnimatePresence>
+        {tooltip && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center" 
+              onClick={() => setTooltip(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Card className="relative p-6 shadow-2xl w-80 max-w-[90vw]">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8"
+                    onClick={() => setTooltip(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  
+                  <div className="space-y-3 mt-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xl font-bold text-foreground">
+                        Quiz #{tooltip.index}
+                      </h4>
+                      <Badge className={difficultyColors[tooltip.session.difficulty || 'medium']}>
+                        {difficultyLabels[tooltip.session.difficulty || 'medium']}
+                      </Badge>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Score:</span>
+                        <span className="font-semibold text-foreground text-base">
+                          {tooltip.session.score}/10
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Accuracy:</span>
+                        <span className="font-semibold text-foreground text-base">
+                          {(tooltip.session.score * 10)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Avg Time:</span>
+                        <span className="font-semibold text-foreground text-base">
+                          {(tooltip.session.averageTime / 1000).toFixed(1)}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-muted-foreground">Date:</span>
+                        <span className="font-semibold text-foreground text-base">
+                          {new Date(tooltip.session.completedAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
