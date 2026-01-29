@@ -1,60 +1,74 @@
-import { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { X, DeviceMobile, ShareFat, Plus, DotsThreeVertical } from '@phosphor-icons/react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { getSetting, setSetting } from '@/lib/db'
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  X,
+  DeviceMobile,
+  ShareFat,
+  Plus,
+  DotsThreeVertical,
+} from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { getSetting, setSetting } from "@/lib/db";
 
 export function InstallGuide() {
-  const [hasSeenGuide, setHasSeenGuide] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const [deviceType, setDeviceType] = useState<'ios' | 'android' | 'desktop' | null>(null)
+  const [hasSeenGuide, setHasSeenGuide] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [deviceType, setDeviceType] = useState<
+    "ios" | "android" | "desktop" | null
+  >(null);
 
   useEffect(() => {
     const checkAndShow = async () => {
-      const seen = await getSetting<boolean>('has-seen-install-guide')
-      if (seen) {
-        setHasSeenGuide(true)
-        return
+      const lastSeenTimestamp = await getSetting<number>(
+        "install-guide-last-seen",
+      );
+      const oneHourAgo = Date.now() - 60 * 60 * 1000; // 1 hour in milliseconds
+
+      if (lastSeenTimestamp && lastSeenTimestamp > oneHourAgo) {
+        setHasSeenGuide(true);
+        return;
       }
 
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      const isStandalone = window.matchMedia(
+        "(display-mode: standalone)",
+      ).matches;
       if (isStandalone) {
-        await setSetting('has-seen-install-guide', true)
-        setHasSeenGuide(true)
-        return
+        await setSetting("install-guide-last-seen", Date.now());
+        setHasSeenGuide(true);
+        return;
       }
 
-      const userAgent = navigator.userAgent.toLowerCase()
-      const isIOS = /iphone|ipad|ipod/.test(userAgent)
-      const isAndroid = /android/.test(userAgent)
-      const isDesktop = !isIOS && !isAndroid
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isIOS = /iphone|ipad|ipod/.test(userAgent);
+      const isAndroid = /android/.test(userAgent);
+      const isDesktop = !isIOS && !isAndroid;
 
       if (isIOS) {
-        setDeviceType('ios')
+        setDeviceType("ios");
       } else if (isAndroid) {
-        setDeviceType('android')
+        setDeviceType("android");
       } else if (isDesktop) {
-        setDeviceType('desktop')
+        setDeviceType("desktop");
       }
 
       setTimeout(() => {
-        setIsVisible(true)
-      }, 3000)
-    }
+        setIsVisible(true);
+      }, 3000);
+    };
 
-    checkAndShow()
-  }, [])
+    checkAndShow();
+  }, []);
 
   const handleDismiss = async () => {
-    setIsVisible(false)
+    setIsVisible(false);
     setTimeout(async () => {
-      await setSetting('has-seen-install-guide', true)
-      setHasSeenGuide(true)
-    }, 300)
-  }
+      await setSetting("install-guide-last-seen", Date.now());
+      setHasSeenGuide(true);
+    }, 300);
+  };
 
-  if (!deviceType || hasSeenGuide) return null
+  if (!deviceType || hasSeenGuide) return null;
 
   return (
     <AnimatePresence>
@@ -85,63 +99,88 @@ export function InstallGuide() {
                     Install Math Quest
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Use it like a real app! Add to your home screen for quick access.
+                    Use it like a real app! Add to your home screen for quick
+                    access.
                   </p>
                 </div>
 
-                {deviceType === 'ios' && (
+                {deviceType === "ios" && (
                   <div className="space-y-2 text-sm">
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">1.</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        1.
+                      </span>
                       <div className="flex items-center gap-2">
                         <span>Click the Share button</span>
-                        <ShareFat weight="fill" className="w-4 h-4 text-primary" />
+                        <ShareFat
+                          weight="fill"
+                          className="w-4 h-4 text-primary"
+                        />
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">2.</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        2.
+                      </span>
                       <span>Scroll down and select "Add to Home Screen"</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">3.</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        3.
+                      </span>
                       <span>Tap "Add"</span>
                     </div>
                   </div>
                 )}
 
-                {deviceType === 'android' && (
+                {deviceType === "android" && (
                   <div className="space-y-2 text-sm">
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">1.</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        1.
+                      </span>
                       <div className="flex items-center gap-2">
                         <span>Click the Share button</span>
-                        <ShareFat weight="fill" className="w-4 h-4 text-primary" />
+                        <ShareFat
+                          weight="fill"
+                          className="w-4 h-4 text-primary"
+                        />
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">2.</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        2.
+                      </span>
                       <span>Scroll down and select "Add to Home Screen"</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">3.</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        3.
+                      </span>
                       <span>Tap "Add"</span>
                     </div>
                   </div>
                 )}
 
-                {deviceType === 'desktop' && (
+                {deviceType === "desktop" && (
                   <div className="space-y-2 text-sm">
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">1.</span>
-                      <span>Look for the install icon in your address bar</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        1.
+                      </span>
+                      <span>Look for the Share icon in your address bar</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">2.</span>
-                      <span>Click "Install" or "Add"</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        2.
+                      </span>
+                      <span>Scroll down and select "Add to Home Screen"</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="font-semibold text-primary shrink-0">3.</span>
-                      <span>Math Quest will open in its own window</span>
+                      <span className="font-semibold text-primary shrink-0">
+                        3.
+                      </span>
+                      <span>Open installed app from your home screen</span>
                     </div>
                   </div>
                 )}
@@ -160,5 +199,5 @@ export function InstallGuide() {
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }
