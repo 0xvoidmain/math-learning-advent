@@ -171,7 +171,7 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
           .duration(300)
           .attr('r', 6)
 
-        const emoji = isImprovement ? '🎉' : '💪'
+        const emoji = isImprovement ? '😊' : '😢'
         const latestData = data[data.length - 1]
         const emojiGroup = g.append('g')
           .attr('class', 'emoji-bubble')
@@ -179,7 +179,7 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
         const bubbleWidth = 50
         const bubbleHeight = 40
         const bubbleX = xScale(latestData.index) + 15
-        const bubbleY = yScale(latestData.score) - 30
+        const bubbleY = yScale(latestData.score) - 55
         
         emojiGroup.append('rect')
           .attr('x', bubbleX)
