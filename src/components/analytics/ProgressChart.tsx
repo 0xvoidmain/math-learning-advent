@@ -172,27 +172,76 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
           .attr('r', 6)
 
         const emoji = isImprovement ? '🎉' : '💪'
-        const emojiGroup = g.append('g')
-          .attr('class', 'emoji-indicator')
-        
         const latestData = data[data.length - 1]
+        const emojiGroup = g.append('g')
+          .attr('class', 'emoji-bubble')
+        
+        const bubbleWidth = 50
+        const bubbleHeight = 40
+        const bubbleX = xScale(latestData.index) + 15
+        const bubbleY = yScale(latestData.score) - 30
+        
+        emojiGroup.append('rect')
+          .attr('x', bubbleX)
+          .attr('y', bubbleY)
+          .attr('width', bubbleWidth)
+          .attr('height', bubbleHeight)
+          .attr('rx', 12)
+          .attr('ry', 12)
+          .attr('fill', 'hsl(var(--card))')
+          .attr('stroke', 'hsl(var(--border))')
+          .attr('stroke-width', 2)
+          .attr('opacity', 0)
+          .transition()
+          .delay(500 + data.length * 100 + 300)
+          .duration(300)
+          .attr('opacity', 1)
+        
+        emojiGroup.append('path')
+          .attr('d', `M ${bubbleX + 10} ${bubbleY + bubbleHeight} L ${bubbleX + 5} ${bubbleY + bubbleHeight + 6} L ${bubbleX + 15} ${bubbleY + bubbleHeight}`)
+          .attr('fill', 'hsl(var(--card))')
+          .attr('stroke', 'hsl(var(--border))')
+          .attr('stroke-width', 2)
+          .attr('stroke-linejoin', 'round')
+          .attr('opacity', 0)
+          .transition()
+          .delay(500 + data.length * 100 + 300)
+          .duration(300)
+          .attr('opacity', 1)
+        
         emojiGroup.append('text')
-          .attr('x', xScale(latestData.index))
-          .attr('y', yScale(latestData.score) - 15)
+          .attr('x', bubbleX + bubbleWidth / 2)
+          .attr('y', bubbleY + bubbleHeight / 2 + 2)
           .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
           .attr('font-size', '24px')
           .attr('opacity', 0)
           .text(emoji)
           .transition()
           .delay(500 + data.length * 100 + 300)
-          .duration(400)
-          .attr('opacity', 1)
-          .attr('y', yScale(latestData.score) - 25)
-          .transition()
           .duration(300)
-          .attr('opacity', 0)
-          .attr('y', yScale(latestData.score) - 35)
-          .remove()
+          .attr('opacity', 1)
+        
+        const shakeAnimation = () => {
+          emojiGroup
+            .transition()
+            .duration(100)
+            .attr('transform', 'translate(-2, 0)')
+            .transition()
+            .duration(100)
+            .attr('transform', 'translate(2, 0)')
+            .transition()
+            .duration(100)
+            .attr('transform', 'translate(-2, 0)')
+            .transition()
+            .duration(100)
+            .attr('transform', 'translate(0, 0)')
+        }
+        
+        setTimeout(() => {
+          shakeAnimation()
+          setInterval(shakeAnimation, 3000)
+        }, 500 + data.length * 100 + 600)
       }
     }
 
