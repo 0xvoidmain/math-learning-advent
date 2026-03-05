@@ -44,8 +44,8 @@ async function resizeImageIfNeeded(
 
 interface RawQuestion {
   question: string;
-  correctAnswer: number;
-  options: number[];
+  correctAnswer: string | number;
+  options: (string | number)[];
 }
 
 function parseQuestionsFromText(text: string): RawQuestion[] {
@@ -140,8 +140,8 @@ Generate exactly 10 questions.`;
 
   return rawQuestions.slice(0, 10).map((q) => ({
     display: q.question,
-    correctAnswer: Number(q.correctAnswer),
-    options: (q.options as number[]).map(Number),
+    correctAnswer: String(q.correctAnswer),
+    options: q.options.map(String),
     operation: "+" as const,
   }));
 }

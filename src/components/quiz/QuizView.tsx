@@ -29,7 +29,7 @@ export function QuizView({
   const [question, setQuestion] = useState<MathQuestion>(
     generateQuestion(difficulty),
   );
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [startTime, setStartTime] = useState(Date.now());
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -64,14 +64,14 @@ export function QuizView({
     }
   }, [currentQuestionNumber, difficulty, hasStarted]);
 
-  const handleAnswerClick = async (answer: number) => {
+  const handleAnswerClick = async (answer: string) => {
     if (isProcessing || selectedAnswer !== null) return;
 
     setIsProcessing(true);
     setSelectedAnswer(answer);
 
     const responseTime = Date.now() - startTime;
-    const isCorrect = answer === question.correctAnswer;
+    const isCorrect = String(answer) === String(question.correctAnswer);
 
     // Play sound effect immediately
     playSound(isCorrect ? "correct" : "incorrect");
@@ -204,23 +204,37 @@ export function QuizView({
           <div className="text-2xl sm:text-3xl text-muted-foreground">= ?</div>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {question.options.map((option, index) => (
-            <AnswerButton
-              key={index}
-              answer={option}
-              isSelected={selectedAnswer === option}
-              isCorrect={
-                selectedAnswer === option && option === question.correctAnswer
+        {(() => {
+          const isLong = question.options.some((o) => String(o).length > 4);
+          return (
+            <div
+              className={
+                isLong
+                  ? "flex flex-col gap-3"
+                  : "grid grid-cols-2 gap-3 sm:gap-4"
               }
-              isIncorrect={
-                selectedAnswer === option && option !== question.correctAnswer
-              }
-              isDisabled={isProcessing}
-              onClick={() => handleAnswerClick(option)}
-            />
-          ))}
-        </div>
+            >
+              {question.options.map((option, index) => (
+                <AnswerButton
+                  key={index}
+                  answer={option}
+                  isLong={isLong}
+                  isSelected={selectedAnswer === option}
+                  isCorrect={
+                    selectedAnswer === option &&
+                    option === question.correctAnswer
+                  }
+                  isIncorrect={
+                    selectedAnswer === option &&
+                    option !== question.correctAnswer
+                  }
+                  isDisabled={isProcessing}
+                  onClick={() => handleAnswerClick(option)}
+                />
+              ))}
+            </div>
+          );
+        })()}
       </Card>
     </motion.div>
   );
