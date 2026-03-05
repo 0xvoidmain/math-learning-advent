@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,10 @@ export function QuizView({
   useEffect(() => {
     if (hasStarted) {
       const generatedQuestions = aiQuestions;
-      if (generatedQuestions && generatedQuestions.length >= currentQuestionNumber) {
+      if (
+        generatedQuestions &&
+        generatedQuestions.length >= currentQuestionNumber
+      ) {
         setQuestion(generatedQuestions[currentQuestionNumber - 1]);
       } else {
         setQuestion(generateQuestion(difficulty));
@@ -142,18 +145,14 @@ export function QuizView({
               ))}
             </div>
 
-            <AnimatePresence>
-              {difficulty === "hard" && (
-                <ImageUploadSection
-                  onQuestionsReady={(questions) => {
-                    setAiQuestions(questions);
-                    setHasStarted(true);
-                    setQuestion(questions[0]);
-                    setStartTime(Date.now());
-                  }}
-                />
-              )}
-            </AnimatePresence>
+            <ImageUploadSection
+              onQuestionsReady={(questions) => {
+                setAiQuestions(questions);
+                setHasStarted(true);
+                setQuestion(questions[0]);
+                setStartTime(Date.now());
+              }}
+            />
           </div>
 
           <Button
