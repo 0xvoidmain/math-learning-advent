@@ -198,7 +198,17 @@ export function QuizView({
           transition={{ duration: 0.4, type: "spring" }}
           className="text-center mb-8"
         >
-          <div className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground mb-2 tracking-tight">
+          <div
+            className={`font-bold text-foreground mb-2 tracking-tight ${
+              question.display.length > 60
+                ? "text-lg sm:text-xl md:text-2xl"
+                : question.display.length > 30
+                  ? "text-2xl sm:text-3xl md:text-4xl"
+                  : question.display.length > 15
+                    ? "text-3xl sm:text-4xl md:text-5xl"
+                    : "text-5xl sm:text-6xl md:text-7xl"
+            }`}
+          >
             {question.display}
           </div>
           <div className="text-2xl sm:text-3xl text-muted-foreground">= ?</div>
