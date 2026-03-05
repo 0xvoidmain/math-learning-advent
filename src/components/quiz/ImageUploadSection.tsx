@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { generateQuestionsFromImages, OPENROUTER_API_KEY_STORAGE } from '@/lib/imageQuizGenerator'
 import { MathQuestion } from '@/lib/mathGenerator'
 import { UploadSimple, CheckCircle, XCircle, SpinnerGap, Image } from '@phosphor-icons/react'
@@ -29,20 +28,17 @@ export function ImageUploadSection({ onQuestionsReady }: ImageUploadModalProps) 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    // Load API key from environment variable first, then fall back to localStorage
+    const envKey = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined
     const savedKey = localStorage.getItem(OPENROUTER_API_KEY_STORAGE) ?? ''
-    setApiKey(savedKey)
+    setApiKey(envKey?.trim() || savedKey)
   }, [])
-
-  const handleApiKeyChange = (value: string) => {
-    setApiKey(value)
-    localStorage.setItem(OPENROUTER_API_KEY_STORAGE, value)
-  }
 
   const handleUploadClick = () => {
     fileInputRef.current?.click()
   }
 
-  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilesSelected = async (e: { target: HTMLInputElement & EventTarget }) => {
     const files = Array.from(e.target.files ?? [])
     if (files.length === 0) return
 
@@ -122,19 +118,6 @@ export function ImageUploadSection({ onQuestionsReady }: ImageUploadModalProps) 
           Upload image(s) from your study material and our AI will create a quiz for you.
         </p>
 
-        <div className="mb-3">
-          <label className="text-xs font-medium text-foreground block mb-1">
-            OpenRouter API Key
-          </label>
-          <Input
-            type="password"
-            placeholder="sk-or-..."
-            value={apiKey}
-            onChange={(e) => handleApiKeyChange(e.target.value)}
-            className="h-8 text-sm"
-          />
-        </div>
-
         <input
           ref={fileInputRef}
           type="file"
@@ -154,12 +137,6 @@ export function ImageUploadSection({ onQuestionsReady }: ImageUploadModalProps) 
           <UploadSimple weight="bold" className="w-4 h-4 mr-2" />
           Upload Image(s)
         </Button>
-
-        {!apiKey.trim() && (
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            Enter your API key above to enable upload.
-          </p>
-        )}
       </motion.div>
 
       <Dialog open={isDialogOpen} onOpenChange={(open) => {

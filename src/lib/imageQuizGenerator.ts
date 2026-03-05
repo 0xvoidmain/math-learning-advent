@@ -1,7 +1,7 @@
 import { MathQuestion } from './mathGenerator'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const MODEL_ID = 'google/gemini-2.0-flash-001'
+const MODEL_ID = 'google/gemini-3-flash-preview'
 
 export const OPENROUTER_API_KEY_STORAGE = 'openrouter-api-key'
 
