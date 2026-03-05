@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { AnswerButton } from "./AnswerButton";
+import { ImageUploadSection } from "./ImageUploadSection";
 import {
   generateQuestion,
   type MathQuestion,
@@ -32,6 +33,7 @@ export function QuizView({
   const [startTime, setStartTime] = useState(Date.now());
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [aiQuestions, setAiQuestions] = useState<MathQuestion[] | null>(null);
   const { playSound, preloadSounds } = useSound();
 
   useEffect(() => {
@@ -41,12 +43,18 @@ export function QuizView({
   useEffect(() => {
     if (currentQuestionNumber === 1) {
       setHasStarted(false);
+      setAiQuestions(null);
     }
   }, [currentQuestionNumber]);
 
   useEffect(() => {
     if (hasStarted) {
-      setQuestion(generateQuestion(difficulty));
+      const generatedQuestions = aiQuestions;
+      if (generatedQuestions && generatedQuestions.length >= currentQuestionNumber) {
+        setQuestion(generatedQuestions[currentQuestionNumber - 1]);
+      } else {
+        setQuestion(generateQuestion(difficulty));
+      }
       setStartTime(Date.now());
       setSelectedAnswer(null);
       setIsProcessing(false);
@@ -133,6 +141,19 @@ export function QuizView({
                 </Button>
               ))}
             </div>
+
+            <AnimatePresence>
+              {difficulty === "hard" && (
+                <ImageUploadSection
+                  onQuestionsReady={(questions) => {
+                    setAiQuestions(questions);
+                    setHasStarted(true);
+                    setQuestion(questions[0]);
+                    setStartTime(Date.now());
+                  }}
+                />
+              )}
+            </AnimatePresence>
           </div>
 
           <Button
